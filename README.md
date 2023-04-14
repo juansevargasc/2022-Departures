@@ -1,4 +1,10 @@
 # US Flight Departures - 2022
+<figure>
+    <img src="img/nicolas-jehly-6WImwokn8dA-unsplash.jpg"
+         alt="Newark Airport">
+    <figcaption>Newark, New Jersey @nicolasjehly</figcaption>
+</figure>
+
 ## Description
 This project aims to explore the US flight departures features in 2022. This will be made through the analysis of weather conditions, cancellations, dates, locations and carriers among others. Nevertheless, it will feature first a ETL pipeline to preprocess different data sources and then load into a OLAP database, for BI consumption.
 
