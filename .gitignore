@@ -1,6 +1,7 @@
 # Specific
 .idea/
 data/
+postgres-volume/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
