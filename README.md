@@ -25,9 +25,10 @@ The project aims to analyze the files that are given in this dataset:
 [2022 U.S. Domestic Flights Departures](https://www.kaggle.com/datasets/jl8771/2022-us-airlines-domestic-departure-data)
 <figure>
     <img src="img/Screenshot 2023-04-20 at 12.39.04 PM.png"
-         alt="Newark Airport">
+         alt="Kaggle Dataset Flight Dep.">
     <figcaption>Author: Jacky Luo</figcaption>
 </figure>
+
 The prework is made to take some original files and export them to SQL database and a JSON file
 to simulate we have different data sources in the project.
 
