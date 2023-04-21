@@ -4,13 +4,18 @@ import logging
 import os
 
 
-# Variables
+# VARIABLES
+# Database in Postgres.
 SQL_SCRIPT_GET_ALL_DEPARTURES = "SELECT * FROM departures LIMIT 20"
 USERNAME = 'postgres'
 PASSWORD = 'mysecretpass'
 HOST = 'localhost'
 PORT = '5439'
 DATABASE = 'departures_db'
+
+# PATHS to files
+# CSV files
+weather_csv_file = '../data/weather.csv'
 
 
 # ------------------------------------------------
