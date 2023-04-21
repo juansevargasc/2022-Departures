@@ -74,12 +74,12 @@ def read_postgres_database(
     try:
         df_departures = pd.read_sql(sql_script, engine)
         df_departures.name = database
-        
+
         if len(df_departures) != 0:
-            print("SUCCESS reading DB") 
+            print("SUCCESS reading DB")
         else:
             print(":( Database is empty")
-            
+
     except Exception as e:
         logging.debug("-- DB CONNECTION Line 63 --")
         logging.error("PANDAS READ SQL - Error reading the database: %s", e)
@@ -144,11 +144,12 @@ def characterize_dfs(*list_dfs) -> None:
     Arguments:
         list_dfs -- list of Pandas df objects.
     """
-    print('--' * 40, '\nINFORMATION ABOUT ALL DATAFRAMES', '\n')
+    print("--" * 40, "\nINFORMATION ABOUT ALL DATAFRAMES", "\n")
     for df in list_dfs:
-        print('-' * 5, 'NAME OF DF ',df.name, '-' * 5, '\n')
+        print("-" * 5, "NAME OF DF ", df.name, "-" * 5, "\n")
         print(df.info())
-    print('\n', 'TOTAL DATAFRAMES: ', len(list_dfs))
+    print("\n", "TOTAL DATAFRAMES: ", len(list_dfs))
+
 
 def transform_dfs(list_dfs: list) -> list:
     """
@@ -193,7 +194,7 @@ if __name__ == "__main__":
     # 3. Read json's
     json_files = ["stations_data.json"]
     list_json_dfs = read_json_files(json_files)
-    
+
     # 4. Get nfo about ALL dataframes. Optional and informative.
     characterize_dfs(*list_csv_dfs, *list_json_dfs, df_departures)
 
