@@ -132,7 +132,6 @@ def read_files(files_list: list) -> list:
     return df_list
 
 
-
 def characterize_dfs(*list_dfs) -> None:
     """
     Showing df characteristics.
@@ -146,6 +145,11 @@ def characterize_dfs(*list_dfs) -> None:
         print(df.info())
     print("\n", "TOTAL DATAFRAMES: ", len(list_dfs))
 
+def create_df_dictionary_using_name(*listdfs) -> dict:
+    
+    df_dictionary = {df.name: df for df in listdfs}
+    
+    
 
 def transform_dfs(list_dfs: list) -> list:
     """
@@ -194,7 +198,9 @@ if __name__ == "__main__":
     all_files = ["Cancellation.csv", "Carriers.csv", "ActiveWeather.csv", "stations_data.json"]
     list_dfs = read_files(all_files)
 
-    # 4. Get nfo about ALL dataframes. Optional and informative.
+    # 4. Get info about ALL dataframes. Optional and informative.
+    # Passing df objects one by one. The df_departures is already a df object, but list_dfs is a list of dfs, therefore we need to use the * (unpacking operator) to pass the list as a list of arguments.
+    # See this valuable resource to learn more about args and kwargs: https://realpython.com/python-kwargs-and-args/
     characterize_dfs(*list_dfs, df_departures)
     
     # 5. Create dfs dictionary
