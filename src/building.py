@@ -9,6 +9,7 @@ HOST = "localhost"
 PORT = "5439"
 DATABASE = "departures_db"
 
+
 def _clean_departure_flights(df_departures: pd.DataFrame) -> pd.DataFrame:
     """
     Cleaning departures flights.
@@ -20,13 +21,11 @@ def _clean_departure_flights(df_departures: pd.DataFrame) -> pd.DataFrame:
         pd.DataFrame -- pandas dataframe with departures flights cleaned.
     """
     # 1. Drop columns
-    print ( df_departures.head(10) )
-    print( df_departures.info() )
-    
-    
-    
-    
+    print(df_departures.head(10))
+    print(df_departures.info())
+
     return None
+
 
 def _clean_active_weather(df_active_weather: pd.DataFrame) -> pd.DataFrame:
     """
@@ -40,7 +39,8 @@ def _clean_active_weather(df_active_weather: pd.DataFrame) -> pd.DataFrame:
     """
     # 1. Drop columns
     df_active_weather.head(10)
-    
+
+
 if __name__ == "__main__":
     # EXTRACT
     # 1. Starting to read the DB containing the main table data.
@@ -52,13 +52,16 @@ if __name__ == "__main__":
     #     database=DATABASE,
     #     sql_script=SQL_SCRIPT_GET_ALL_DEPARTURES,
     # )
-    
-    # 2. Read csv's
-    all_files = ["Cancellation.csv", "Carriers.csv", "ActiveWeather.csv", "stations_data.json"]
-    list_dfs = read_files(all_files)
-    
-    # 3. Cleaning active weather.
-    
-    _clean_active_weather(df_active_weather)
 
-    
+    # 2. Read csv's
+    all_files = [
+        "Cancellation.csv",
+        "Carriers.csv",
+        "ActiveWeather.csv",
+        "stations_data.json",
+    ]
+    list_dfs = read_files(all_files)
+
+    # 3. Cleaning active weather.
+
+    _clean_active_weather(df_active_weather)

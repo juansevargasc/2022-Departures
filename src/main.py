@@ -1,7 +1,6 @@
 import pandas as pd
 from sqlalchemy import create_engine
 import logging
-import os
 
 
 # VARIABLES
@@ -29,13 +28,7 @@ logging.basicConfig(
 
 # ------------------------------------------------
 
-
-# def run_example():
-#     a = "Run this example"
-#     b = os.path.abspath("../")
-#     print("This is only for DEBUG")
-#     print("{} - This is the path: {}".format(a, b))
-#     print("--" * 40)
+# FUNCTIONS
 
 
 def read_postgres_database(
@@ -124,11 +117,13 @@ def read_files(files_list: list) -> list:
         else:
             logging.error("EXTENSION IS NOT VALID - Only csv and json are admitted")
             return None
-        
+
         # Adding the valid pandas dataframe to the list.
-        df.name = file.split('/')[-1].split('.')[0] # Obtaining the name of the file, without extension or path. And assigning as the name of df.
+        df.name = file.split("/")[-1].split(".")[
+            0
+        ]  # Obtaining the name of the file, without extension or path. And assigning as the name of df.
         df_list.append(df)
-        
+
     return df_list
 
 
@@ -145,11 +140,17 @@ def characterize_dfs(*list_dfs) -> None:
         print(df.info())
     print("\n", "TOTAL DATAFRAMES: ", len(list_dfs))
 
+
 def create_df_dictionary_using_name(*listdfs) -> dict:
-    
+    """
+    Create a dictionary of dataframes using the name of the dataframe as key.
+
+    Returns:
+        Dictionary object.
+    """
     df_dictionary = {df.name: df for df in listdfs}
-    
-    
+    return df_dictionary
+
 
 def transform_dfs(list_dfs: list) -> list:
     """
@@ -161,8 +162,9 @@ def transform_dfs(list_dfs: list) -> list:
     Returns:
         list(pd.DataFrame) -- list of pandas dataframes
     """
-    
+
     return list_dfs
+
 
 def clean_departure_flights(df_departures: pd.DataFrame) -> pd.DataFrame:
     """
@@ -175,9 +177,8 @@ def clean_departure_flights(df_departures: pd.DataFrame) -> pd.DataFrame:
         pd.DataFrame -- pandas dataframe with departures flights cleaned.
     """
     # 1. Drop columns
-    print ( df_departures.head(10) )
-    
-    
+    print(df_departures.head(10))
+
     return None
 
 
@@ -195,18 +196,24 @@ if __name__ == "__main__":
     )
 
     # 2. Read csv's
-    all_files = ["Cancellation.csv", "Carriers.csv", "ActiveWeather.csv", "stations_data.json"]
+    all_files = [
+        "Cancellation.csv",
+        "Carriers.csv",
+        "ActiveWeather.csv",
+        "stations_data.json",
+    ]
     list_dfs = read_files(all_files)
 
     # 4. Get info about ALL dataframes. Optional and informative.
     # Passing df objects one by one. The df_departures is already a df object, but list_dfs is a list of dfs, therefore we need to use the * (unpacking operator) to pass the list as a list of arguments.
     # See this valuable resource to learn more about args and kwargs: https://realpython.com/python-kwargs-and-args/
     characterize_dfs(*list_dfs, df_departures)
-    
+
     # 5. Create dfs dictionary
-    
+    df_dictionary = create_df_dictionary_using_name(*list_dfs, df_departures)
+    df_names = list(df_dictionary.keys())
 
     # TRANSFORM
     # 5. Transform dataframes
-    # DEPARTURES: df_departures 
-    clean_departure_flights(df_departures)
+    # DEPARTURES: df_departures
+    # clean_departure_flights(df_departures)
