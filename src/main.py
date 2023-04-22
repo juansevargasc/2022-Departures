@@ -6,7 +6,7 @@ import os
 
 # VARIABLES
 # Database in Postgres.
-SQL_SCRIPT_GET_ALL_DEPARTURES = "SELECT * FROM departures LIMIT 20"
+SQL_SCRIPT_GET_ALL_DEPARTURES = "SELECT * FROM departures LIMIT 1000"
 USERNAME = "postgres"
 PASSWORD = "mysecretpass"
 HOST = "localhost"
@@ -89,7 +89,7 @@ def read_postgres_database(
     return df_departures
 
 
-def read_csv_files(csv_files_list: list) -> list:
+def read_files(files_list: list) -> list:
     """
     This function is used to read a csv file and return a pandas dataframe.
 
@@ -100,41 +100,37 @@ def read_csv_files(csv_files_list: list) -> list:
         list(pd.DataFrame) -- list of pandas dataframes
     """
     df_list = []
-    for csv_file in csv_files_list:
-        try:
-            csv_file = f"./data/csvFiles/{csv_file}"
-            df = pd.read_csv(csv_file, sep=",")
-            df.name = csv_file
-            df_list.append(df)
-        except Exception as e:
-            logging.debug("-- CSV READ Line 91 --")
-            logging.error("CSV READ - Error reading the csv file: %s", e)
-            raise e
+    for file in files_list:
+        # Using str.endswith() method to check extension.
+        # Reading files if they have a csv extension.
+        if file.endswith(".csv"):
+            try:
+                file = f"./data/csvFiles/{file}"
+                df = pd.read_csv(file, sep=",")
+            except Exception as e:
+                logging.debug("-- CSV READ Line 91 --")
+                logging.error("CSV READ - Error reading the csv file: %s", e)
+                raise e
+        # Reading files if they have a json extension.
+        elif file.endswith(".json"):
+            try:
+                file = f"./data/jsonFiles/{file}"
+                df = pd.read_json(file)
+            except Exception as e:
+                logging.debug("-- JSON READ Line 101 --")
+                logging.error("JSON READ - Error reading the json file: %s", e)
+                raise e
+        # If the extension is not valid, it will return None immediately and therefore end the function.
+        else:
+            logging.error("EXTENSION IS NOT VALID - Only csv and json are admitted")
+            return None
+        
+        # Adding the valid pandas dataframe to the list.
+        df.name = file.split('/')[-1].split('.')[0] # Obtaining the name of the file, without extension or path. And assigning as the name of df.
+        df_list.append(df)
+        
     return df_list
 
-
-def read_json_files(json_files_list: list) -> list:
-    """
-    This function is used to read a json file and return a pandas dataframe.
-
-    Arguments:
-        json_files_list -- list of json files you want to read
-
-    Returns:
-        list(pd.DataFrame) -- list of pandas dataframes
-    """
-    df_list = []
-    for json_file in json_files_list:
-        try:
-            json_file = f"./data/jsonFiles/{json_file}"
-            df = pd.read_json(json_file)
-            df.name = json_file
-            df_list.append(df)
-        except Exception as e:
-            logging.debug("-- JSON READ Line 113 --")
-            logging.error("JSON READ - Error reading the json file: %s", e)
-            raise e
-    return df_list
 
 
 def characterize_dfs(*list_dfs) -> None:
@@ -161,17 +157,24 @@ def transform_dfs(list_dfs: list) -> list:
     Returns:
         list(pd.DataFrame) -- list of pandas dataframes
     """
-    df_list = []
-    for df in list_dfs:
-        try:
-            df = pd.read_csv(csv_file, sep=",")
-            df.name = csv_file
-            df_list.append(df)
-        except Exception as e:
-            logging.debug("-- CSV READ Line 91 --")
-            logging.error("CSV READ - Error reading the csv file: %s", e)
-            raise e
-    return df_list
+    
+    return list_dfs
+
+def clean_departure_flights(df_departures: pd.DataFrame) -> pd.DataFrame:
+    """
+    Cleaning departures flights.
+
+    Arguments:
+        df_departures -- pandas dataframe with departures flights.
+
+    Returns:
+        pd.DataFrame -- pandas dataframe with departures flights cleaned.
+    """
+    # 1. Drop columns
+    print ( df_departures.head(10) )
+    
+    
+    return None
 
 
 if __name__ == "__main__":
@@ -188,15 +191,16 @@ if __name__ == "__main__":
     )
 
     # 2. Read csv's
-    csv_files = ["Cancellation.csv", "Carriers.csv", "ActiveWeather.csv"]
-    list_csv_dfs = read_csv_files(csv_files)
-
-    # 3. Read json's
-    json_files = ["stations_data.json"]
-    list_json_dfs = read_json_files(json_files)
+    all_files = ["Cancellation.csv", "Carriers.csv", "ActiveWeather.csv", "stations_data.json"]
+    list_dfs = read_files(all_files)
 
     # 4. Get nfo about ALL dataframes. Optional and informative.
-    characterize_dfs(*list_csv_dfs, *list_json_dfs, df_departures)
+    characterize_dfs(*list_dfs, df_departures)
+    
+    # 5. Create dfs dictionary
+    
 
     # TRANSFORM
     # 5. Transform dataframes
+    # DEPARTURES: df_departures 
+    clean_departure_flights(df_departures)
