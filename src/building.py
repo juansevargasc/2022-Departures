@@ -9,6 +9,9 @@ HOST = "localhost"
 PORT = "5439"
 DATABASE = "departures_db"
 
+# File Names
+ACTIVE_WEATHER = 'ActiveWeather'
+
 
 def _clean_departure_flights(df_departures: pd.DataFrame) -> pd.DataFrame:
     """
@@ -38,7 +41,8 @@ def _clean_active_weather(df_active_weather: pd.DataFrame) -> pd.DataFrame:
         pd.DataFrame -- pandas dataframe with active weather cleaned.
     """
     # 1. Drop columns
-    df_active_weather.head(10)
+    print('TITLE', df_active_weather.name)
+    print(df_active_weather.head(10))
 
 
 if __name__ == "__main__":
@@ -52,7 +56,7 @@ if __name__ == "__main__":
     #     database=DATABASE,
     #     sql_script=SQL_SCRIPT_GET_ALL_DEPARTURES,
     # )
-
+    
     # 2. Read csv's
     all_files = [
         "Cancellation.csv",
@@ -61,7 +65,10 @@ if __name__ == "__main__":
         "stations_data.json",
     ]
     list_dfs = read_files(all_files)
+    
+     # 4. Create dfs dictionary
+    df_dictionary = create_df_dictionary_using_name(*list_dfs)
+    df_names = list(df_dictionary.keys())
 
-    # 3. Cleaning active weather.
-
-    _clean_active_weather(df_active_weather)
+    # 5
+    _clean_active_weather(df_dictionary[ACTIVE_WEATHER])
