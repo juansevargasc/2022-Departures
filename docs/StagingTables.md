@@ -2,7 +2,7 @@
 
 # Staging Tables  🥈
 
-### ActiveWeather
+### Active Weather
 
 - Name: `dim_active_weather`
 
@@ -76,7 +76,7 @@ Lookup information for the station/airport.
 
 ---
 
-### ************************CompleteData************************
+### ************************Departures************************
 
 ********************FACT TABLE********************
 
