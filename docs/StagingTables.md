@@ -121,14 +121,11 @@ fk |
 | origin | int64 | fk |
 | dest | int64 | fk |
 | cancelled | int64 | fk |
-| mesonet_station | int64 | What is a mesonet?
-The term "mesonet" is derived from the words "mesoscale" and "network." In meteorology, a mesonet is typically a network of collectively owned and operated automated weather stations that are installed close enough to each other and report data frequently enough-. Source: https://www.campbellsci.com/mesonets
-
-fk (airport station code i.e. JFK) |
+| mesonet_station | int64 | What is a mesonet? The term "mesonet" is derived from the words "mesoscale" and "network." In meteorology, a mesonet is typically a network of collectively owned and operated automated weather stations that are installed close enough to each other and report data frequently enough-. Source: https://www.campbellsci.com/mesonets fk (airport station code i.e. JFK) |
 | active_weather | object | fk |
 
 <aside>
-💡 Fields highlighted are already associated to an existing dim table.
+💡 Fk Fields highlighted are already associated to an existing dim table.
 
 </aside>
 
@@ -147,11 +144,7 @@ fk (airport station code i.e. JFK) |
 | --- | --- | --- |
 | year_of_manufacture | int64 |  |
 | manufacturer | object |  |
-| icao_type | object | An aircraft type designator is a two-, three- or four-character https://en.wikipedia.org/wiki/Alphanumeric https://en.wikipedia.org/wiki/Code designating every aircraft type (and some sub-types) that may appear in flight planning. 
-These codes are defined by both the https://en.wikipedia.org/wiki/International_Civil_Aviation_Organization (ICAO) and the https://en.wikipedia.org/wiki/International_Air_Transport_Association (IATA).
-Source: https://en.wikipedia.org/wiki/List_of_aircraft_type_designators
-Example: A321 |
-| range | object | The maximal total range is the maximum distance an aircraft can fly between takeoff and landing. Powered aircraft range is limited by the aviation fuel energy storage capacity (chemical or electrical) considering both weight and volume limits.
-
-Aircraft Range Encoding Short Range: Range < 2300 NM Medium Range: 2300 NM <= Range <= 4000 NM Long Range: Range > 4000 NM |
-| width | object | Aircraft Body Type |
+| icao_type | object | An aircraft type designator is a two-, three- or four-character code designating every aircraft type (and some sub-types) that may appear in flight planning. 
+These codes are defined by both the ICAO and the [IATA](https://en.wikipedia.org/wiki/International_Air_Transport_Association) - Source: https://en.wikipedia.org/wiki/List_of_aircraft_type_designators. Example: A321 |
+| range | object | The maximal total range is the maximum distance an aircraft can fly between takeoff and landing. Powered aircraft range is limited by the aviation fuel energy storage capacity (chemical or electrical) considering both weight and volume limits. Aircraft Range Encoding Short Range: Range < 2300 NM Medium Range: 2300 NM <= Range <= 4000 NM Long Range: Range > 4000 NM |
+| width | object | Aircraft Body Type  Example: Narrow-body. |
