@@ -144,7 +144,6 @@ fk |
 | --- | --- | --- |
 | year_of_manufacture | int64 |  |
 | manufacturer | object |  |
-| icao_type | object | An aircraft type designator is a two-, three- or four-character code designating every aircraft type (and some sub-types) that may appear in flight planning. 
-These codes are defined by both the ICAO and the [IATA](https://en.wikipedia.org/wiki/International_Air_Transport_Association) - Source: https://en.wikipedia.org/wiki/List_of_aircraft_type_designators. Example: A321 |
+| icao_type | object | An aircraft type designator is a two-, three- or four-character code designating every aircraft type (and some sub-types) that may appear in flight planning. These codes are defined by both the ICAO and the [IATA](https://en.wikipedia.org/wiki/International_Air_Transport_Association) - Source: https://en.wikipedia.org/wiki/List_of_aircraft_type_designators. Example: A321 |
 | range | object | The maximal total range is the maximum distance an aircraft can fly between takeoff and landing. Powered aircraft range is limited by the aviation fuel energy storage capacity (chemical or electrical) considering both weight and volume limits. Aircraft Range Encoding Short Range: Range < 2300 NM Medium Range: 2300 NM <= Range <= 4000 NM Long Range: Range > 4000 NM |
 | width | object | Aircraft Body Type  Example: Narrow-body. |
