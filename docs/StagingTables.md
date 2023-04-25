@@ -82,11 +82,9 @@ Lookup information for the station/airport.
 
 **About this file**
 
-Compiled dataset of US domestic flight data with added airport, aircraft and present weather data.
+Compiled dataset of US domestic flight data with added airport and present weather data.
 
-**Aircraft Range Encoding** Short Range: Range < 2300 NM Medium Range: 2300 NM <= Range <= 4000 NM Long Range: Range > 4000 NM
-
-**Cloud Level Encoding:**Low Level: Height < 6500 ft Mid Level: 6500 ft <= Height <= 20000 ft High Level: Height > 20000 ft
+**Cloud Level Encoding:** Low Level: Height < 6500 ft Mid Level: 6500 ft <= Height <= 20000 ft High Level: Height > 20000 ft
 
 | Column Name | Data Type | Description |
 | --- | --- | --- |
@@ -139,6 +137,8 @@ fk |
     - icao_type
     - range
     - width
+
+**Aircraft Range Encoding Short Range**: Range < 2300 NM Medium Range: 2300 NM <= Range <= 4000 NM Long Range: Range > 4000 NM
 
 | Column Name | DType | Description |
 | --- | --- | --- |
