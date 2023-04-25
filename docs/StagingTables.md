@@ -106,10 +106,7 @@ Compiled dataset of US domestic flight data with added airport, aircraft and pre
 | wind_gust | float64 | (in kt) (In spanish: ráfaga) |
 | visibility | float64 | (in mi) |
 | temperature | float64 | (in C) |
-| dew_point | float64 | The dew point is the temperature to which air must be cooled to become saturated with https://en.wikipedia.org/wiki/Water_vapor, assuming constant air pressure and water content. When cooled below the dew point, https://en.wikipedia.org/wiki/Moisture capacity is reduced and airborne water vapor will https://en.wikipedia.org/wiki/Condensation
- to form liquid water known as https://en.wikipedia.org/wiki/Dew.https://en.wikipedia.org/wiki/Dew_point#cite_note-1
-When this occurs via contact with a colder surface, dew will form on that surface.https://en.wikipedia.org/wiki/Dew_point#cite_note-2
-(Dew in spanish: rocío) |
+| dew_point | float64 | The dew point is the temperature to which air must be cooled to become saturated with https://en.wikipedia.org/wiki/Water_vapor, assuming constant air pressure and water content. When cooled below the dew point, https://en.wikipedia.org/wiki/Moisture capacity is reduced and airborne water vapor will https://en.wikipedia.org/wiki/Condensation to form liquid water known as https://en.wikipedia.org/wiki/Dew https://en.wikipedia.org/wiki/Dew_point#cite_note-1 When this occurs via contact with a colder surface, dew will form on that surface.https://en.wikipedia.org/wiki/Dew_point#cite_note-2 (Dew in spanish: rocío) |
 | rel_humidity | float64 | (%) |
 | low_level_cloud | Boolean | Cloud Level Encoding:
 Low Level: Height < 6500 ft  |
