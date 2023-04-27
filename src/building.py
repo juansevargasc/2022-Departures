@@ -1,4 +1,7 @@
 from main import *
+from data_types import *
+from exceptions import SchemaError
+#from pandera import SchemaErrors
 
 # VARIABLES
 # Database in Postgres.
@@ -41,8 +44,23 @@ def _clean_active_weather(df_active_weather: pd.DataFrame) -> pd.DataFrame:
         pd.DataFrame -- pandas dataframe with active weather cleaned.
     """
     # 1. Drop columns
+    
+    df_active_weather['id_weather'] = df_active_weather.index
+    df_active_weather.rename(columns={'WEATHER_DESCRIPTION': 'weather_description'}, inplace=True)
+    
     print('TITLE', df_active_weather.name)
     print(df_active_weather.head(10))
+    
+    
+    
+    # Final Check. Does it comply with the schema?
+    try:
+        stg_active_weather_schema.validate(stg_active_weather, lazy=True)
+    except Exception as e:
+        logging.error("Validation error")
+        logging.error("ERROR LINE 80: %s", e)
+    
+    return df_active_weather
 
 
 if __name__ == "__main__":
@@ -71,4 +89,18 @@ if __name__ == "__main__":
     df_names = list(df_dictionary.keys())
 
     # 5
-    _clean_active_weather(df_dictionary[ACTIVE_WEATHER])
+    stg_active_weather = _clean_active_weather(df_dictionary[ACTIVE_WEATHER])
+    
+   
+    
+    # TODO: Use custom exceptions.
+    # try:
+    #     stg_active_weather_schema.validate(stg_active_weather, lazy=True)
+    # except SchemaError as err:
+    #     logging.error("Validation error")
+    #     logging.error("ERROR LINE 80: %s", err)
+    #     #logging.error("%s", err.failure_cases)
+    #     #logging.error("%s", err.data)
+    #       # dataframe of schema errors
+    #       # invalid dataframe
+        
