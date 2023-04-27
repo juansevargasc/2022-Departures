@@ -130,3 +130,23 @@ CREATE TABLE IF NOT EXISTS departures (
     active_weather INTEGER -- FK Active Weather Table
 );
 ```
+
+- [Optional] If you want to use Docker for your Postgres Database, you can use:
+
+```shell
+docker run -d --rm --name=postgres  -p 5439:5439 -v /Your-User/your-path-for-postgres-data/:/var/lib/postgresql/data -e POSTGRES_PASSWORD=mysecretpass postgres
+```
+
+- To load the CSV file you want into the database, you can use:
+
+```SQL
+COPY departures (fl_date,dep_hour,mkt_unique_carrier,mkt_carrier_fl_num,op_unique_carrier,op_carrier_fl_num,tail_num,
+    origin,dest,dep_time,crs_dep_time,taxi_out,dep_delay,air_time,distance,cancelled,latitude,longitude,
+    elevation,mesonet_station,year_of_manufacture,manufacturer,icao_type,range,width,wind_dir,wind_spd,
+    wind_gust,visibility,temperature,dew_point,rel_humidity,altimeter,lowest_cloud_layer,n_cloud_layer,
+    low_level_cloud,mid_level_cloud,high_level_cloud,cloud_cover,active_weather
+    )
+    FROM '/var/lib/postgresql/data/stage_departures.csv' -- This is the case for my csv called stage_departures.csv that is within the docker volume for the container.
+    DELIMITER ','
+    CSV HEADER;
+```
