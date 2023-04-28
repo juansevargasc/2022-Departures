@@ -83,7 +83,7 @@ Lookup information for the station/airport.
 
 Compiled dataset of US domestic flight data with added airport, and present weather data.
 
-**Cloud Level Encoding:**Low Level: Height < 6500 ft Mid Level: 6500 ft <= Height <= 20000 ft High Level: Height > 20000 ft
+**Cloud Level Encoding:** Low Level: Height < 6500 ft Mid Level: 6500 ft <= Height <= 20000 ft High Level: Height > 20000 ft
 
 | Column Name | Data Type | Description |
 | --- | --- | --- |
@@ -105,16 +105,11 @@ Compiled dataset of US domestic flight data with added airport, and present weat
 | temperature | float64 | (in C) |
 | dew_point | float64 | The dew point is the temperature to which air must be cooled to become saturated with https://en.wikipedia.org/wiki/Water_vapor, assuming constant air pressure and water content. When cooled below the dew point, https://en.wikipedia.org/wiki/Moisture capacity is reduced and airborne water vapor will https://en.wikipedia.org/wiki/Condensation to form liquid water known as https://en.wikipedia.org/wiki/Dew.https://en.wikipedia.org/wiki/Dew_point#cite_note-1 When this occurs via contact with a colder surface, dew will form on that surface.https://en.wikipedia.org/wiki/Dew_point#cite_note-2 (Dew in spanish: rocío) |
 | rel_humidity | float64 | (%) |
-| low_level_cloud | Boolean | Cloud Level Encoding:
-Low Level: Height < 6500 ft  |
-| mid_level_cloud | Boolean | Cloud Level Encoding:
-Mid Level: 6500 ft <= Height <= 20000 f |
-| high_level_cloud | Boolean | Cloud Level Encoding:
-High Level: Height > 20000 ft |
-| mkt_unique_carrier | string | Marketing Carrier Unique Code
-fk |
-| op_unique_carrier | string | Operating Carrier Unique Code. Sometimes a flight can be marketed by one carrier and operated by another. 
-fk |
+| low_level_cloud | Boolean | Cloud Level Encoding:Low Level: Height < 6500 ft  |
+| mid_level_cloud | Boolean | Cloud Level Encoding: Mid Level: 6500 ft <= Height <= 20000 f |
+| high_level_cloud | Boolean | Cloud Level Encoding: High Level: Height > 20000 ft |
+| mkt_unique_carrier | string | Marketing Carrier Unique Code - fk |
+| op_unique_carrier | string | Operating Carrier Unique Code. Sometimes a flight can be marketed by one carrier and operated by another - fk |
 | origin | string | fk |
 | dest | string | fk |
 | cancelled | int64 | fk - Already linked as FK |
