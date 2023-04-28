@@ -52,3 +52,8 @@ The prework is made to take some original files and export them to SQL database 
 to simulate we have different data sources in the project.  See more in [Prework](./prework)
 
 **Documentation of Stages**
+
+- [Raw Tables](./docs/RawTables.md)
+- [Staging Tables](./docs/StagingTables.md)
+- [Star Schema Tables](./docs/RawTables.md)
+
