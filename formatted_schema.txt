@@ -1,44 +1,22 @@
-# CONSTANTS
-
-# VARIABLES
-# Database in Postgres.
-SQL_SCRIPT_GET_ALL_DEPARTURES = "SELECT * FROM departures LIMIT 10000"
-USERNAME = "postgres"
-PASSWORD = "mysecretpass"
-HOST = "localhost"
-PORT = "5439"
-DATABASE = "departures_db"
-
-# File Names
-ACTIVE_WEATHER_FILENAME = 'ActiveWeather'
-
-# Dataframe Names
-ACTIVE_WEATHER_STG = 'stg_active_weather'
-CANCELLATION_STG = 'stg_cancellation'
-CARRIERS_STG = 'stg_carriers'
-AIRPORTS_STG = 'stg_airports'
-
-
-# Dataframe Types
-df_active_weather_types = { 
+df_active_weather = { 
     'id_weather': 'int64',
     'status': 'int64',
-    'weather_description': 'string', # astype('|S') which will by default set the length to the max len it encounters
+    'weather_description': 'string',
 }
 
-df_cancellation_types = { 
+df_cancellation = { 
     'id_cancellation': 'int64',
     'status': 'int64',
     'cancellation_reason': 'string',
 }
 
-df_carriers_types = { 
+df_carriers = { 
     'id_carriers': 'int64',
     'code': 'string',
     'description': 'string',
 }
 
-df_stations_types = { 
+df_stations = { 
     'id_airport': 'int64',
     'airport_code': 'string',
     'airport_name': 'string',
@@ -53,7 +31,7 @@ df_stations_types = {
     'mesonet_code': 'string',
 }
 
-df_departures_types = { 
+df_departures = { 
     'id_departure': 'int64',
     'flight_date': 'datetime64[ns]',
     'dep_hour': 'int64',
@@ -84,11 +62,10 @@ df_departures_types = {
     'active_weather': 'int64',
 }
 
-df_aircraft_types = { 
+df_aircraft = { 
     'id_aircraft': 'int64',
     'year_of_manufacture': 'int64',
     'manufacturer': 'category',
     'icao_type': 'string',
     'range': 'category',
     'width': 'category',
-}

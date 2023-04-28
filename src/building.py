@@ -1,19 +1,55 @@
-from main import *
+from main import create_df_dictionary_using_name, read_files, logging, pd
 from pandera_schemas import *
 from exceptions import SchemaError
+from constants import *
+from utils import read_schema_column_datatypes
 
 
-# VARIABLES
-# Database in Postgres.
-SQL_SCRIPT_GET_ALL_DEPARTURES = "SELECT * FROM departures LIMIT 10000"
-USERNAME = "postgres"
-PASSWORD = "mysecretpass"
-HOST = "localhost"
-PORT = "5439"
-DATABASE = "departures_db"
+def _standard_transform_in_df( df: pd.DataFrame, df_name: str, df_types: dict, id_name: str, pandera_schema: pa.DataFrameModel ) -> pd.DataFrame:
+    '''
+    Standard transformation for all dataframes.
 
-# File Names
-ACTIVE_WEATHER = 'ActiveWeather'
+    Arguments:
+        df -- Pandas dataframe.
+        df_name -- Dataframe name.
+        df_types -- Dictionary with column names and data types.
+        id_name -- Primary key column name.
+        pandera_schema -- Pandera schema.
+
+    Returns:
+        Transformed dataframe.
+    '''
+    
+    # 1. Add id_weather PK column
+    df[id_name] = df.index
+    
+    # 2. Change column naming to lowercase.
+    new_columns = { column : column.lower() for column in df.columns}
+    df.rename(columns=new_columns, inplace=True)
+   
+    
+    # 4. Enforce data types.
+    df = df.astype(df_types, copy=False)
+    
+     # 3. Change name.
+    df.name = df_name
+    
+    # DEBUG
+    print('TITLE', df.name)
+    print(df.head(10))
+    print(df.info())
+    
+
+    # Final Check. Does it comply with the schema?
+    try:
+        pandera_schema.validate(df, lazy=True)
+    except Exception as e:
+        print('\nERROR in schema validation. See app.logs for more details')
+        logging.error("Validation error")
+        logging.error("ERROR LINE 80: %s", e)
+    
+    return df
+
 
 
 def _clean_departure_flights(df_departures: pd.DataFrame) -> pd.DataFrame:
@@ -31,43 +67,6 @@ def _clean_departure_flights(df_departures: pd.DataFrame) -> pd.DataFrame:
     print(df_departures.info())
 
     return None
-
-
-def _clean_active_weather(df_active_weather: pd.DataFrame) -> pd.DataFrame:
-    """
-    Cleaning active weather.
-
-    Arguments:
-        df_active_weather -- pandas dataframe with active weather.
-
-    Returns:
-        pd.DataFrame -- pandas dataframe with active weather cleaned.
-    """
-    # 1. Add id_weather column
-    df_active_weather['id_weatheR'] = df_active_weather.index
-    
-    # 2. Change column naming to lowercase.
-    new_columns = { column : column.lower() for column in df_active_weather.columns}
-    df_active_weather.rename(columns=new_columns, inplace=True)
-   
-    # 3. Change name.
-    df_active_weather.name = 'stg_active_weather'
-    
-    print('TITLE', df_active_weather.name)
-    print(df_active_weather.head(10))
-    
-    
-    
-    # Final Check. Does it comply with the schema?
-    try:
-        stg_active_weather_schema.validate(df_active_weather, lazy=True)
-    except Exception as e:
-        print('\nERROR in schema validation. See app.logs for more details')
-        logging.error("Validation error")
-        logging.error("ERROR LINE 80: %s", e)
-    
-    return df_active_weather
-
 
 if __name__ == "__main__":
     # EXTRACT
@@ -94,19 +93,23 @@ if __name__ == "__main__":
     df_dictionary = create_df_dictionary_using_name(*list_dfs)
     df_names = list(df_dictionary.keys())
 
+    # TRANSFORM
     # 5. 
-    stg_active_weather = _clean_active_weather(df_dictionary[ACTIVE_WEATHER])
     
-   
+    stg_active_weather = _standard_transform_in_df( 
+                            df=df_dictionary[ACTIVE_WEATHER_FILENAME], 
+                            df_name=ACTIVE_WEATHER_STG, 
+                            df_types=df_active_weather_types, 
+                            id_name='id_weather',
+                            pandera_schema=stg_active_weather_schema # Passing Pandera class, not instance object.
+                        )
     
-    # TODO: Use custom exceptions.
-    # try:
-    #     stg_active_weather_schema.validate(stg_active_weather, lazy=True)
-    # except SchemaError as err:
-    #     logging.error("Validation error")
-    #     logging.error("ERROR LINE 80: %s", err)
-    #     #logging.error("%s", err.failure_cases)
-    #     #logging.error("%s", err.data)
-    #       # dataframe of schema errors
-    #       # invalid dataframe
+    
+    
+    
+    # 6. 
+    print('\n', '--'*20)
+    read_schema_column_datatypes('columns.txt')
+    
+    
         
