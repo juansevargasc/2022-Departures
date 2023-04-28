@@ -10,9 +10,12 @@ PORT = "5439"
 DATABASE = "departures_db"
 
 # File Names
-ACTIVE_WEATHER_FILENAME = 'ActiveWeather'
+ACTIVE_WEATHER_FILENAME= 'ActiveWeather.csv'
+CANCELLATION_FILENAME = 'Cancellation.csv'
+CARRIERS_FILENAME = 'Carriers.csv'
+AIRPORTS_FILENAME = 'stations_data.json'
 
-# Dataframe Names
+# Staging Dataframe Names
 ACTIVE_WEATHER_STG = 'stg_active_weather'
 CANCELLATION_STG = 'stg_cancellation'
 CARRIERS_STG = 'stg_carriers'
@@ -23,7 +26,7 @@ AIRPORTS_STG = 'stg_airports'
 df_active_weather_types = { 
     'id_weather': 'int64',
     'status': 'int64',
-    'weather_description': 'string', # astype('|S') which will by default set the length to the max len it encounters
+    'weather_description': 'string', # We could also use astype('|S') which will by default set the length to the max len it encounters.
 }
 
 df_cancellation_types = { 

@@ -80,22 +80,24 @@ if __name__ == "__main__":
     #     sql_script=SQL_SCRIPT_GET_ALL_DEPARTURES,
     # )
     
-    # 2. Read csv's
+    # 2. Read csv's or json's
     all_files = [
-        "Cancellation.csv",
-        "Carriers.csv",
-        "ActiveWeather.csv",
-        "stations_data.json",
+        ACTIVE_WEATHER_FILENAME,
+        CANCELLATION_FILENAME,
+        CARRIERS_FILENAME,
+        AIRPORTS_FILENAME
     ]
     list_dfs = read_files(all_files)
     
-     # 4. Create dfs dictionary
+    # 4. Create dfs dictionary
+    # The key is the name of the dataframe which is the same as the file name including its extension, but not including any abs. or rel. path.
+    # i.e. 'ActiveWeather.csv' is the name of the dataframe and the key in the dictionary. 
     df_dictionary = create_df_dictionary_using_name(*list_dfs)
     df_names = list(df_dictionary.keys())
 
     # TRANSFORM
-    # 5. 
-    
+    # 5. Standard transformation for all dataframes.
+    # stg_active_weather
     stg_active_weather = _standard_transform_in_df( 
                             df=df_dictionary[ACTIVE_WEATHER_FILENAME], 
                             df_name=ACTIVE_WEATHER_STG, 
@@ -104,7 +106,7 @@ if __name__ == "__main__":
                             pandera_schema=stg_active_weather_schema # Passing Pandera class, not instance object.
                         )
     
-    
+    # stg_cancellation
     
     
     # 6. 

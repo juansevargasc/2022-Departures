@@ -119,9 +119,7 @@ def read_files(files_list: list) -> list:
             return None
 
         # Adding the valid pandas dataframe to the list.
-        df.name = file.split("/")[-1].split(".")[
-            0
-        ]  # Obtaining the name of the file, without extension or path. And assigning as the name of df.
+        df.name = file.split("/")[-1] # Obtaining the name of the file, with extension but without path. And assigning as the name of df.
         df_list.append(df)
 
     return df_list
