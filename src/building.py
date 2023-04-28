@@ -1,7 +1,7 @@
 from main import *
-from data_types import *
+from pandera_schemas import *
 from exceptions import SchemaError
-#from pandera import SchemaErrors
+
 
 # VARIABLES
 # Database in Postgres.
@@ -43,10 +43,15 @@ def _clean_active_weather(df_active_weather: pd.DataFrame) -> pd.DataFrame:
     Returns:
         pd.DataFrame -- pandas dataframe with active weather cleaned.
     """
-    # 1. Drop columns
+    # 1. Add id_weather column
+    df_active_weather['id_weatheR'] = df_active_weather.index
     
-    df_active_weather['id_weather'] = df_active_weather.index
-    df_active_weather.rename(columns={'WEATHER_DESCRIPTION': 'weather_description'}, inplace=True)
+    # 2. Change column naming to lowercase.
+    new_columns = { column : column.lower() for column in df_active_weather.columns}
+    df_active_weather.rename(columns=new_columns, inplace=True)
+   
+    # 3. Change name.
+    df_active_weather.name = 'stg_active_weather'
     
     print('TITLE', df_active_weather.name)
     print(df_active_weather.head(10))
@@ -55,8 +60,9 @@ def _clean_active_weather(df_active_weather: pd.DataFrame) -> pd.DataFrame:
     
     # Final Check. Does it comply with the schema?
     try:
-        stg_active_weather_schema.validate(stg_active_weather, lazy=True)
+        stg_active_weather_schema.validate(df_active_weather, lazy=True)
     except Exception as e:
+        print('\nERROR in schema validation. See app.logs for more details')
         logging.error("Validation error")
         logging.error("ERROR LINE 80: %s", e)
     
@@ -88,7 +94,7 @@ if __name__ == "__main__":
     df_dictionary = create_df_dictionary_using_name(*list_dfs)
     df_names = list(df_dictionary.keys())
 
-    # 5
+    # 5. 
     stg_active_weather = _clean_active_weather(df_dictionary[ACTIVE_WEATHER])
     
    

@@ -134,7 +134,7 @@ CREATE TABLE IF NOT EXISTS departures (
 - [Optional] If you want to use Docker for your Postgres Database, you can use:
 
 ```shell
-docker run -d --rm --name=postgres  -p 5439:5439 -v /Your-User/your-path-for-postgres-data/:/var/lib/postgresql/data -e POSTGRES_PASSWORD=mysecretpass postgres
+docker run -d --rm --name=postgres  -p 5439:5439 -v /Your-User/your-path-for-postgres-data:/var/lib/postgresql/data -e POSTGRES_PASSWORD=mysecretpass postgres
 ```
 
 - To load the CSV file you want into the database, you can use:
