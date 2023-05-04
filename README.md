@@ -5,12 +5,14 @@
     <figcaption>Newark, New Jersey @nicolasjehly</figcaption>
 </figure>
 
-<aside>
+---
+
+
 👨🏻‍💻
-- Author: @juansevargasc
-- Dataset Source:  <a href="https://www.kaggle.com/datasets/jl8771/2022-us-airlines-domestic-departure-data">2022 U.S. Domestic Flights Departures, Kaggle</a>
-- Topics: Data Engineering, ETL, Data Analysis, Data Warehouse
-</aside>
+> - Author: @juansevargasc
+> - Dataset Source:  <a href="https://www.kaggle.com/datasets/jl8771/2022-us-airlines-domestic-departure-data">2022 U.S. Domestic Flights Departures, Kaggle</a>
+> - Topics: Data Engineering, ETL, Data Analysis, Data Warehouse
+
 
 ## Description
 This project aims to explore the US flight departures features in 2022. This will be made through the analysis of weather conditions, cancellations, dates, locations and carriers among others. Nevertheless, it will feature first a ETL pipeline to preprocess different data sources and then load into a OLAP database, for BI consumption.
