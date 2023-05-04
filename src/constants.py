@@ -157,3 +157,16 @@ df_airports_rename_columns = {
 }
 
 df_departures_rename_columns = {"wind_spd": "wind_speed", "fl_date": "flight_date"}
+
+
+# Fact Dim Tables
+# Foreign key columns specification
+df_fact_departures_types = {
+    "mkt_unique_carrier": "int64",  # FK
+    "op_unique_carrier": "int64",  # FK
+    "origin": "int64",  # FK
+    "dest": "int64",  # FK
+    "cancelled": "int64", # Comes already as FK
+    "mesonet_station": "int64", # FK
+    "active_weather": "int64", # Comes already as FK
+}
