@@ -1,3 +1,6 @@
+# Description: Utility functions for the project.
+
+
 def read_schema_column_datatypes(filepath: str) -> None:
     """
     Reads a file containing the column names and data types, and outputs a file with the desired format.
@@ -32,3 +35,40 @@ def read_schema_column_datatypes(filepath: str) -> None:
                 data_type = list_of_line_inputs[1].split("\n")[0]
                 # Writing
                 output_file.write(f"    '{column_name}': '{data_type}',\n")
+
+
+def characterize_dfs(*list_dfs) -> None:
+    """
+    Showing df characteristics.
+
+    Arguments:
+        list_dfs -- list of Pandas df objects.
+    """
+    print("--" * 40, "\nINFORMATION ABOUT ALL DATAFRAMES", "\n")
+    for df in list_dfs:
+        print("-" * 5, "NAME OF DF ", df.name, "-" * 5, "\n")
+        print(df.info())
+    print("\n", "TOTAL DATAFRAMES: ", len(list_dfs))
+
+
+def create_df_dictionary_using_name(*listdfs) -> dict:
+    """
+    Create a dictionary of dataframes using the name of the dataframe as key.
+
+    Returns:
+        Dictionary object.
+    """
+    df_dictionary = {df.name: df for df in listdfs}
+    return df_dictionary
+
+
+def cast_to_int(number) -> int:
+    try:
+        result = float(number)
+        result = int(result)
+        # print(result)
+    except Exception:
+        print(f"This value {number} cannot be casted to int. Continue...")
+        logging.debug("Value cannot be casted")
+        return number
+    return result

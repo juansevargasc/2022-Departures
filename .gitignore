@@ -4,6 +4,7 @@ data/
 postgres-volume/
 .DS_Store
 .vscode/
+Access/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

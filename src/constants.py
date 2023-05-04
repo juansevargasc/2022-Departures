@@ -156,7 +156,4 @@ df_airports_rename_columns = {
     "MESONET_STATION": "mesonet_code",
 }
 
-df_departures_rename_columns = {
-    "wind_spd": "wind_speed",
-    "fl_date": "flight_date"
-}
+df_departures_rename_columns = {"wind_spd": "wind_speed", "fl_date": "flight_date"}

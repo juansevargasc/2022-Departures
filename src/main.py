@@ -1,21 +1,18 @@
 import pandas as pd
 from sqlalchemy import create_engine
 import logging
-
-
-# VARIABLES
-# Database in Postgres.
-# SQL_SCRIPT_GET_ALL_DEPARTURES = "SELECT * FROM departures LIMIT 1000"
-# USERNAME = "postgres"
-# PASSWORD = "mysecretpass"
-# HOST = "localhost"
-# PORT = "5439"
-# DATABASE = "departures_db"
-
-# PATHS to files
-# CSV files
-weather_csv_file = "../data/weather.csv"
-
+import boto3
+from pandera_schemas import *
+from exceptions import SchemaError
+from constants import *
+from utils import *
+import os
+from transform_functions import (
+    _standard_transform_in_df,
+    _transform_aircrafts,
+    _transform_airports,
+    _transform_departure_flights,
+)
 
 # ------------------------------------------------
 # LOGGING
@@ -26,11 +23,17 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s %(message)s",
 )
 
+# create a file handler
+file_handler = logging.FileHandler("app.log")
+file_handler.setLevel(logging.INFO)
+
+# add the file handler to the logger
+logger = logging.getLogger()
+logger.addHandler(file_handler)
+
 # ------------------------------------------------
 
 # FUNCTIONS
-
-
 def read_postgres_database(
     username: str, password: str, host: str, port: str, database: str, sql_script: str
 ) -> pd.DataFrame:
@@ -127,93 +130,178 @@ def read_files(files_list: list) -> list:
     return df_list
 
 
-def characterize_dfs(*list_dfs) -> None:
-    """
-    Showing df characteristics.
+def extract_and_transform_raw_files_and_convert_to_stg_tables() -> bool:
+    result = False
+
+    # EXTRACT
+    try:
+        # 1. Starting to read the DB containing the main table data.
+        df_departures = read_postgres_database(
+            username=USERNAME,
+            password=PASSWORD,
+            host=HOST,
+            port=PORT,
+            database=DATABASE,
+            sql_script=SQL_SCRIPT_GET_ALL_DEPARTURES,
+        )
+    except Exception as e:
+        print("ERROR READING POSTGRES DATABASE")
+        logging.error("ERROR READING POSTGRES DATABASE: %s", e)
+        return result
+
+    try:
+        # 2. Read csv's or json's
+        all_files = [
+            ACTIVE_WEATHER_FILENAME,
+            CANCELLATION_FILENAME,
+            CARRIERS_FILENAME,
+            AIRPORTS_FILENAME,
+        ]
+        list_dfs = read_files(all_files)
+
+        # 4. Create dfs dictionary
+        # The key is the name of the dataframe which is the same as the file name including its extension, but not including any abs. or rel. path.
+        # i.e. 'ActiveWeather.csv' is the name of the dataframe and the key in the dictionary.
+        df_dictionary = create_df_dictionary_using_name(*list_dfs)
+
+    except Exception as e:
+        print("ERROR READING CSV/JSON FILES")
+        logging.error("ERROR READING CSV/JSON FILES: %s", e)
+        return result
+
+    # TRANSFORM
+
+    # 5. Standard transformation for all dataframes.
+    # stg_active_weather
+    stg_active_weather = _standard_transform_in_df(
+        df=df_dictionary[ACTIVE_WEATHER_FILENAME],
+        df_name=ACTIVE_WEATHER_STG,
+        df_types=df_active_weather_types,
+        id_name="id_weather",
+        pandera_schema=stg_active_weather_schema,  # Passing Pandera class, not instance object.
+    )
+
+    # stg_cancellation
+    stg_cancellation = _standard_transform_in_df(
+        df=df_dictionary[CANCELLATION_FILENAME],
+        df_name=CANCELLATION_STG,
+        df_types=df_cancellation_types,
+        id_name="id_cancellation",
+        pandera_schema=stg_cancellation_schema,  # Passing Pandera class, not instance object.
+    )
+
+    # stg_carriers
+    stg_carriers = _standard_transform_in_df(
+        df=df_dictionary[CARRIERS_FILENAME],
+        df_name=CARRIERS_STG,
+        df_types=df_carriers_types,
+        id_name="id_carriers",
+        pandera_schema=stg_carriers_schema,  # Passing Pandera class, not instance object.
+    )
+
+    # stg_airports
+    stg_airports = _transform_airports(
+        df=df_dictionary[AIRPORTS_FILENAME],
+        df_name=AIRPORTS_STG,
+        df_types=df_airports_types,
+        pandera_schema=stg_airports_schema,  # Passing Pandera class, not instance object.
+        new_df_column_names=df_airports_rename_columns,
+    )
+
+    # stg_aircraft
+    stg_aircraft = _transform_aircrafts(
+        df=df_departures,
+        df_aircraft_columns=df_aircraft_columns,
+        df_name=AIRCRAFT_STG,
+        df_types=df_aircraft_types,
+        id_name="id_aircraft",
+        pandera_schema=stg_aircraft_schema,  # Passing Pandera class, not instance object.
+    )
+
+    # stg_departures
+    stg_departures = _transform_departure_flights(
+        df=df_departures,
+        df_name=DEPARTURES_STG,
+        df_types=df_departures_types,
+        id_name="id_departure",
+        pandera_schema=stg_departures_schema,  # Passing Pandera class, not instance object.
+        new_df_column_names=df_departures_rename_columns,
+    )
+
+    # DEBUG
+    logging.info(stg_active_weather.info())
+    logging.info(f"stg_active_weather: {stg_active_weather.info()}")
+    logging.info(f"stg_cancellation: {stg_cancellation.info()}")
+    logging.debug(f"stg_carriers: {stg_carriers.info()}")
+    logging.debug(f"stg_airports: {stg_airports.info()}")
+    logging.debug(f"stg_aircraft: {stg_aircraft.info()}")
+    logging.debug(f"stg_departures: {stg_departures.info()}")
+
+    print("Generating from Pandas df to CSV: {}".format(stg_active_weather.name))
+    # Generate CSV
+    stg_active_weather.to_csv(
+        "data/staging/{}.csv".format(stg_active_weather.name), index=False
+    )
+    stg_cancellation.to_csv(
+        "data/staging/{}.csv".format(stg_cancellation.name), index=False
+    )
+    stg_carriers.to_csv("data/staging/{}.csv".format(stg_carriers.name), index=False)
+    stg_airports.to_csv("data/staging/{}.csv".format(stg_airports.name), index=False)
+    stg_aircraft.to_csv("data/staging/{}.csv".format(stg_aircraft.name), index=False)
+    stg_departures.to_csv(
+        "data/staging/{}.csv".format(stg_departures.name), index=False
+    )
+
+    result = True
+
+    return result
+
+
+def load_to_staging_in_s3(path_to_files: str) -> bool:
+    '''
+    Load staging files to S3.
 
     Arguments:
-        list_dfs -- list of Pandas df objects.
-    """
-    print("--" * 40, "\nINFORMATION ABOUT ALL DATAFRAMES", "\n")
-    for df in list_dfs:
-        print("-" * 5, "NAME OF DF ", df.name, "-" * 5, "\n")
-        print(df.info())
-    print("\n", "TOTAL DATAFRAMES: ", len(list_dfs))
-
-
-def create_df_dictionary_using_name(*listdfs) -> dict:
-    """
-    Create a dictionary of dataframes using the name of the dataframe as key.
+        path_to_files -- Path to staging files.
 
     Returns:
-        Dictionary object.
-    """
-    df_dictionary = {df.name: df for df in listdfs}
-    return df_dictionary
+        Boolean -- True if files were loaded to S3, False otherwise.
+    '''
+    
+    result = False
+
+    client = boto3.client(
+        "s3",
+        aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"),
+        aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY"),
+    )
+
+    for csv_file_name in os.listdir(path_to_files):
+
+        print("Uploading {} to S3".format(csv_file_name))
+        # Upload to S3
+        client.upload_file(
+            Filename="data/staging/{}".format(csv_file_name),
+            Bucket="departures-project-us-2022-juanse",
+            Key="staging/{}".format(csv_file_name),
+        )
+    result = True
+
+    return result
 
 
-def transform_dfs(list_dfs: list) -> list:
-    """
-    Transforming dataframes.
-
-    Arguments:
-        list_dfs -- list of Pandas df objects.
-
-    Returns:
-        list(pd.DataFrame) -- list of pandas dataframes
-    """
-
-    return list_dfs
-
-
-def clean_departure_flights(df_departures: pd.DataFrame) -> pd.DataFrame:
-    """
-    Cleaning departures flights.
-
-    Arguments:
-        df_departures -- pandas dataframe with departures flights.
-
-    Returns:
-        pd.DataFrame -- pandas dataframe with departures flights cleaned.
-    """
-    # 1. Drop columns
-    print(df_departures.head(10))
-
-    return None
 
 
 if __name__ == "__main__":
+    # 1. Extract and Trnasform
+    if extract_and_transform_raw_files_and_convert_to_stg_tables():
+        print("Extract and Transform: SUCCESS :)")
 
-    # EXTRACT
-    # 1. Starting to read the DB containing the main table data.
-    df_departures = read_postgres_database(
-        username=USERNAME,
-        password=PASSWORD,
-        host=HOST,
-        port=PORT,
-        database=DATABASE,
-        sql_script=SQL_SCRIPT_GET_ALL_DEPARTURES,
-    )
+    # 2. If transform is successful, we can upload the staging tables to a S3 buckets called Staging.
+    path_to_staging_files = 'data/staging'
+    if load_to_staging_in_s3(path_to_staging_files):
+        print("Load to S3: SUCCESS :)")
+        
+    # 3. Final 
 
-    # 2. Read csv's
-    all_files = [
-        "Cancellation.csv",
-        "Carriers.csv",
-        "ActiveWeather.csv",
-        "stations_data.json",
-    ]
-    list_dfs = read_files(all_files)
-
-    # 3. Get info about ALL dataframes. Optional and informative.
-    # Passing df objects one by one. The df_departures is already a df object, but list_dfs is a list of dfs, therefore we need to use the * (unpacking operator) to pass the list as a list of arguments.
-    # See this valuable resource to learn more about args and kwargs: https://realpython.com/python-kwargs-and-args/
-    characterize_dfs(*list_dfs, df_departures)
-
-    # 4. Create dfs dictionary
-    df_dictionary = create_df_dictionary_using_name(*list_dfs, df_departures)
-    df_names = list(df_dictionary.keys())
-
-    # TRANSFORM
-    # 5. Transform dataframes
-    # DEPARTURES: df_departures
-    # clean_departure_flights(df_departures)
+    

@@ -1,16 +1,10 @@
-from main import (
-    read_postgres_database,
-    create_df_dictionary_using_name,
-    read_files,
-    logging,
-    pd,
-)
+import pandas as pd
+import logging
 from pandera_schemas import *
-from exceptions import SchemaError
 from constants import *
-from utils import read_schema_column_datatypes
+from utils import *
 
-
+# Trnasform Functions
 def _standard_transform_in_df(
     df: pd.DataFrame,
     df_name: str,
@@ -142,18 +136,6 @@ def _transform_aircrafts(
     return df_aircrafts
 
 
-def cast_to_int(number) -> int:
-    try:
-        result = float(number)
-        result = int(result)
-        # print(result)
-    except Exception:
-        print(f"This value {number} cannot be casted to int. Continue...")
-        logging.debug("Value cannot be casted")
-        return number
-    return result
-
-
 def _transform_departure_flights(
     df: pd.DataFrame,
     df_name: str,
@@ -212,120 +194,3 @@ def _transform_departure_flights(
         logging.error("ERROR LINE 80: %s", e)
 
     return df
-
-
-def transform_raw_files_and_convert_to_stg_tables() -> bool:
-    result = False
-
-    # EXTRACT
-    try:
-        # 1. Starting to read the DB containing the main table data.
-        df_departures = read_postgres_database(
-            username=USERNAME,
-            password=PASSWORD,
-            host=HOST,
-            port=PORT,
-            database=DATABASE,
-            sql_script=SQL_SCRIPT_GET_ALL_DEPARTURES,
-        )
-    except Exception as e:
-        print("ERROR READING POSTGRES DATABASE")
-        logging.error("ERROR READING POSTGRES DATABASE: %s", e)
-        return result
-
-    try:
-        # 2. Read csv's or json's
-        all_files = [
-            ACTIVE_WEATHER_FILENAME,
-            CANCELLATION_FILENAME,
-            CARRIERS_FILENAME,
-            AIRPORTS_FILENAME,
-        ]
-        list_dfs = read_files(all_files)
-
-        # 4. Create dfs dictionary
-        # The key is the name of the dataframe which is the same as the file name including its extension, but not including any abs. or rel. path.
-        # i.e. 'ActiveWeather.csv' is the name of the dataframe and the key in the dictionary.
-        df_dictionary = create_df_dictionary_using_name(*list_dfs)
-
-    except Exception as e:
-        print("ERROR READING CSV/JSON FILES")
-        logging.error("ERROR READING CSV/JSON FILES: %s", e)
-        return result
-
-    # TRANSFORM
-
-    # 5. Standard transformation for all dataframes.
-    # stg_active_weather
-    stg_active_weather = _standard_transform_in_df(
-        df=df_dictionary[ACTIVE_WEATHER_FILENAME],
-        df_name=ACTIVE_WEATHER_STG,
-        df_types=df_active_weather_types,
-        id_name="id_weather",
-        pandera_schema=stg_active_weather_schema,  # Passing Pandera class, not instance object.
-    )
-
-    # stg_cancellation
-    stg_cancellation = _standard_transform_in_df(
-        df=df_dictionary[CANCELLATION_FILENAME],
-        df_name=CANCELLATION_STG,
-        df_types=df_cancellation_types,
-        id_name="id_cancellation",
-        pandera_schema=stg_cancellation_schema,  # Passing Pandera class, not instance object.
-    )
-
-    # stg_carriers
-    stg_carriers = _standard_transform_in_df(
-        df=df_dictionary[CARRIERS_FILENAME],
-        df_name=CARRIERS_STG,
-        df_types=df_carriers_types,
-        id_name="id_carriers",
-        pandera_schema=stg_carriers_schema,  # Passing Pandera class, not instance object.
-    )
-
-    # stg_airports
-    stg_airports = _transform_airports(
-        df=df_dictionary[AIRPORTS_FILENAME],
-        df_name=AIRPORTS_STG,
-        df_types=df_airports_types,
-        pandera_schema=stg_airports_schema,  # Passing Pandera class, not instance object.
-        new_df_column_names=df_airports_rename_columns,
-    )
-
-    # stg_aircraft
-    stg_aircraft = _transform_aircrafts(
-        df=df_departures,
-        df_aircraft_columns=df_aircraft_columns,
-        df_name=AIRCRAFT_STG,
-        df_types=df_aircraft_types,
-        id_name="id_aircraft",
-        pandera_schema=stg_aircraft_schema,  # Passing Pandera class, not instance object.
-    )
-
-    # stg_departures
-    stg_departures = _transform_departure_flights(
-        df=df_departures,
-        df_name=DEPARTURES_STG,
-        df_types=df_departures_types,
-        id_name="id_departure",
-        pandera_schema=stg_departures_schema,  # Passing Pandera class, not instance object.
-        new_df_column_names=df_departures_rename_columns,
-    )
-
-    # DEBUG
-    logging.info(stg_active_weather.info())
-    logging.info(f"stg_active_weather: {stg_active_weather.info()}")
-    logging.info(f"stg_cancellation: {stg_cancellation.info()}")
-    logging.debug(f"stg_carriers: {stg_carriers.info()}")
-    logging.debug(f"stg_airports: {stg_airports.info()}")
-    logging.debug(f"stg_aircraft: {stg_aircraft.info()}")
-    logging.debug(f"stg_departures: {stg_departures.info()}")
-
-    result = True
-
-    return result
-
-
-if __name__ == "__main__":
-    if transform_raw_files_and_convert_to_stg_tables():
-        print("SUCCESS :)")
