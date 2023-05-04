@@ -53,7 +53,13 @@ to simulate we have different data sources in the project.  See more in [Prework
 
 **Documentation of Stages**
 
-- [Raw Tables](./docs/RawTables.md)
-- [Staging Tables](./docs/StagingTables.md)
-- [Star Schema Tables](./docs/RawTables.md)
+- **[Raw Tables](./docs/RawTables.md)**
+- **[Staging Tables](./docs/StagingTables.md)**
 
+- ### [Star Schema Tables](./docs/RawTables.md)
+
+<figure>
+    <img src="img/departures_schema_diagram.jpeg"
+         alt="Star Schema for project.">
+    <figcaption>Final Dim - Fact Schema</figcaption>
+</figure>
