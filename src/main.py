@@ -5,12 +5,12 @@ import logging
 
 # VARIABLES
 # Database in Postgres.
-SQL_SCRIPT_GET_ALL_DEPARTURES = "SELECT * FROM departures LIMIT 1000"
-USERNAME = "postgres"
-PASSWORD = "mysecretpass"
-HOST = "localhost"
-PORT = "5439"
-DATABASE = "departures_db"
+# SQL_SCRIPT_GET_ALL_DEPARTURES = "SELECT * FROM departures LIMIT 1000"
+# USERNAME = "postgres"
+# PASSWORD = "mysecretpass"
+# HOST = "localhost"
+# PORT = "5439"
+# DATABASE = "departures_db"
 
 # PATHS to files
 # CSV files

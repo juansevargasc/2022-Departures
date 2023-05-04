@@ -2,7 +2,9 @@
 
 # VARIABLES
 # Database in Postgres.
-SQL_SCRIPT_GET_ALL_DEPARTURES = "SELECT * FROM departures LIMIT 10000"
+SQL_SCRIPT_GET_ALL_DEPARTURES = (
+    "SELECT * FROM departures ORDER BY fl_date ASC LIMIT 1000"
+)
 USERNAME = "postgres"
 PASSWORD = "mysecretpass"
 HOST = "localhost"
@@ -20,7 +22,8 @@ ACTIVE_WEATHER_STG = "stg_active_weather"
 CANCELLATION_STG = "stg_cancellation"
 CARRIERS_STG = "stg_carriers"
 AIRPORTS_STG = "stg_airports"
-
+AIRCRAFT_STG = "stg_aircraft"
+DEPARTURES_STG = "stg_departures"
 
 # Dataframe Types
 df_active_weather_types = {
@@ -41,7 +44,7 @@ df_carriers_types = {
     "description": "string",
 }
 
-df_stations_types = {
+df_airports_types = {
     "id_airport": "int64",
     "airport_code": "string",
     "airport_name": "string",
@@ -75,9 +78,9 @@ df_departures_types = {
     "temperature": "float64",
     "dew_point": "float64",
     "rel_humidity": "float64",
-    "low_level_cloud": "Boolean",
-    "mid_level_cloud": "Boolean",
-    "high_level_cloud": "Boolean",
+    "low_level_cloud": "bool",
+    "mid_level_cloud": "bool",
+    "high_level_cloud": "bool",
     "mkt_unique_carrier": "string",
     "op_unique_carrier": "string",
     "origin": "string",
@@ -94,4 +97,66 @@ df_aircraft_types = {
     "icao_type": "string",
     "range": "category",
     "width": "category",
+}
+
+# Columns
+df_aircraft_columns = [
+    "year_of_manufacture",
+    "manufacturer",
+    "icao_type",
+    "range",
+    "width",
+]
+
+df_departures_columns = [
+    "id_departure",
+    "flight_date",
+    "dep_hour",
+    "mkt_carrier_fl_num",
+    "op_carrier_fl_num",
+    "dep_time",
+    "crs_dep_time",
+    "taxi_out",
+    "dep_delay",
+    "air_time",
+    "distance",
+    "wind_dir",
+    "wind_speed",
+    "wind_gust",
+    "visibility",
+    "temperature",
+    "dew_point",
+    "rel_humidity",
+    "low_level_cloud",
+    "mid_level_cloud",
+    "high_level_cloud",
+    "mkt_unique_carrier",
+    "op_unique_carrier",
+    "origin",
+    "dest",
+    "cancelled",
+    "mesonet_station",
+    "active_weather",
+]
+
+# Rename Columns
+df_airports_rename_columns = {
+    "AIRPORT_ID": "id_airport",
+    "AIRPORT": "airport_code",
+    "DISPLAY_AIRPORT_NAME": "airport_name",
+    "DISPLAY_AIRPORT_CITY_NAME_FULL": "airport_complete_name",
+    "AIRPORT_STATE_NAME": "us_state",
+    "AIRPORT_STATE_CODE": "us_state_abbr",
+    "LATITUDE": "latitude",
+    "LONGITUDE": "longitude",
+    "ELEVATION": "elevation",
+    "ICAO": "icao_code",
+    "IATA": "iata_code",
+    # "FAA": "faa",
+    "MESONET_STATION": "mesonet_code",
+}
+
+df_departures_rename_columns = {
+    "wind_spd": "wind_speed",
+    "fl_date": "flight_date"
 }
