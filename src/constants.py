@@ -166,7 +166,7 @@ df_fact_departures_types = {
     "op_unique_carrier": "int64",  # FK
     "origin": "int64",  # FK
     "dest": "int64",  # FK
-    "cancelled": "int64", # Comes already as FK
-    "mesonet_station": "int64", # FK
-    "active_weather": "int64", # Comes already as FK
+    "cancelled": "int64",  # Comes already as FK
+    "mesonet_station": "int64",  # FK
+    "active_weather": "int64",  # Comes already as FK
 }

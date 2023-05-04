@@ -257,19 +257,20 @@ def extract_and_transform_raw_files_and_convert_to_stg_tables() -> bool:
     return result
 
 
-def transform_stg_to_fact_dim_tables(path_to_stg: str,types_of_columns: dict) -> bool:
+def transform_stg_to_fact_dim_tables(path_to_stg: str, types_of_columns: dict) -> bool:
     pass
-    #TODO: Implement this function.
-    
-    fact_table = pd.read_csv('{}/stg_departures.csv'.format(path_to_stg))
-    dim_active_weather = pd.read_csv('{}/stg_active_weather.csv'.format(path_to_stg))
-    dim_cancellation = pd.read_csv('{}/stg_cancellation.csv'.format(path_to_stg))
-    dim_carriers = pd.read_csv('{}/stg_carriers.csv'.format(path_to_stg))
-    dim_airports = pd.read_csv('{}/stg_airports.csv'.format(path_to_stg))
-    dim_aircraft = pd.read_csv('{}/stg_aircraft.csv'.format(path_to_stg))
-    
+    # TODO: Implement this function.
+
+    fact_table = pd.read_csv("{}/stg_departures.csv".format(path_to_stg))
+    # dim_active_weather = pd.read_csv("{}/stg_active_weather.csv".format(path_to_stg))
+    # dim_cancellation = pd.read_csv("{}/stg_cancellation.csv".format(path_to_stg))
+    # dim_carriers = pd.read_csv("{}/stg_carriers.csv".format(path_to_stg))
+    # dim_airports = pd.read_csv("{}/stg_airports.csv".format(path_to_stg))
+    # dim_aircraft = pd.read_csv("{}/stg_aircraft.csv".format(path_to_stg))
+
+
 def load_to_staging_in_s3(path_to_files: str) -> bool:
-    '''
+    """
     Load staging files to S3.
 
     Arguments:
@@ -277,8 +278,8 @@ def load_to_staging_in_s3(path_to_files: str) -> bool:
 
     Returns:
         Boolean -- True if files were loaded to S3, False otherwise.
-    '''
-    
+    """
+
     result = False
 
     client = boto3.client(
@@ -299,10 +300,10 @@ def load_to_staging_in_s3(path_to_files: str) -> bool:
     result = True
 
     return result
-    
+
 
 def load_to_S3_to_redshift(path_to_files: str) -> bool:
-    '''
+    """
     Load staging files to S3.
 
     Arguments:
@@ -310,8 +311,8 @@ def load_to_S3_to_redshift(path_to_files: str) -> bool:
 
     Returns:
         Boolean -- True if files were loaded to S3, False otherwise.
-    '''
-    
+    """
+
     result = False
 
     client = boto3.client(
@@ -319,14 +320,13 @@ def load_to_S3_to_redshift(path_to_files: str) -> bool:
         aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"),
         aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY"),
     )
-    
-    
+
     # Uploading all files except fact table
     for csv_file_name in os.listdir(path_to_files):
         if csv_file_name != "stg_departures.csv":
             # Dim table
             new_name = csv_file_name.replace("stg", "dim")
-            
+
             print("Uploading {} to S3".format(new_name))
             # Upload to S3
             client.upload_file(
@@ -338,18 +338,17 @@ def load_to_S3_to_redshift(path_to_files: str) -> bool:
 
     return result
 
+
 if __name__ == "__main__":
     # 1. Extract and Trnasform
     if extract_and_transform_raw_files_and_convert_to_stg_tables():
         print("Extract and Transform: SUCCESS :)")
 
     # 2. If transform is successful, we can upload the staging tables to a S3 buckets called Staging.
-    path_to_staging_files = 'data/staging'
+    path_to_staging_files = "data/staging"
     # if load_to_staging_in_s3(path_to_staging_files):
     #     print("Load to S3: SUCCESS :)")
-        
-    # 3. Final 
+
+    # 3. Final
     if load_to_S3_to_redshift(path_to_staging_files):
         print("Load to S3 Redshift target: SUCCESS :)")
-
-    
