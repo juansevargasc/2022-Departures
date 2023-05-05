@@ -256,17 +256,47 @@ def extract_and_transform_raw_files_and_convert_to_stg_tables() -> bool:
 
     return result
 
+def lookup_for_fk(main_df: pd.DataFrame, fk_df: pd.DataFrame):
+    pass
+    #for row in main_df.iterrows()
 
 def transform_stg_to_fact_dim_tables(path_to_stg: str, types_of_columns: dict) -> bool:
-    pass
+    #pass
     # TODO: Implement this function.
 
     fact_table = pd.read_csv("{}/stg_departures.csv".format(path_to_stg))
     # dim_active_weather = pd.read_csv("{}/stg_active_weather.csv".format(path_to_stg))
     # dim_cancellation = pd.read_csv("{}/stg_cancellation.csv".format(path_to_stg))
-    # dim_carriers = pd.read_csv("{}/stg_carriers.csv".format(path_to_stg))
-    # dim_airports = pd.read_csv("{}/stg_airports.csv".format(path_to_stg))
-    # dim_aircraft = pd.read_csv("{}/stg_aircraft.csv".format(path_to_stg))
+    dim_carriers = pd.read_csv("{}/stg_carriers.csv".format(path_to_stg))
+    dim_airports = pd.read_csv("{}/stg_airports.csv".format(path_to_stg))
+    dim_aircraft = pd.read_csv("{}/stg_aircraft.csv".format(path_to_stg))
+    
+    
+    #fact_table = fact_table.astype(df_fact_departures_types)
+    #print(fact_table.info())
+    
+    # Aircraft FK processing
+    aircraft_in_fact_table = fact_table[df_aircraft_columns]
+    print(aircraft_in_fact_table.info())
+    print(aircraft_in_fact_table.head())
+    
+    #dim_aircraft = dim_aircraft[df_aircraft_columns]
+    print(dim_aircraft.info())
+    print(dim_aircraft.head())
+    
+    for index, _ in aircraft_in_fact_table.iterrows():
+        for index, _ in dim_aircraft[df_aircraft_columns].iterrows():
+            row_aircraft = dim_aircraft.iloc[index]
+            fact_row = aircraft_in_fact_table.iloc[index]
+            
+            if row_aircraft.equals(fact_row):
+                print("FOUND MATCH")
+                #print(row_aircraft)
+                #print(fact_row)
+                print('Index', index)
+                print( dim_aircraft.iloc[index] )
+                break
+        break
 
 
 def load_to_staging_in_s3(path_to_files: str) -> bool:
@@ -341,14 +371,21 @@ def load_to_S3_to_redshift(path_to_files: str) -> bool:
 
 if __name__ == "__main__":
     # 1. Extract and Trnasform
-    if extract_and_transform_raw_files_and_convert_to_stg_tables():
-        print("Extract and Transform: SUCCESS :)")
+    # if extract_and_transform_raw_files_and_convert_to_stg_tables():
+    #     print("Extract and Transform: SUCCESS :)")
 
     # 2. If transform is successful, we can upload the staging tables to a S3 buckets called Staging.
     path_to_staging_files = "data/staging"
     # if load_to_staging_in_s3(path_to_staging_files):
     #     print("Load to S3: SUCCESS :)")
 
+
+    transform_stg_to_fact_dim_tables(
+        path_to_stg=path_to_staging_files, 
+        types_of_columns=df_departures_types
+    )
+
     # 3. Final
-    if load_to_S3_to_redshift(path_to_staging_files):
-        print("Load to S3 Redshift target: SUCCESS :)")
+    # if load_to_S3_to_redshift(path_to_staging_files):
+    #     print("Load to S3 Redshift target: SUCCESS :)")
+

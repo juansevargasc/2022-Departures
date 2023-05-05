@@ -71,6 +71,8 @@ The project aims to analyze the files that are given in this dataset:
 The prework is made to take some original files and export them to SQL database and a JSON file
 to simulate we have different data sources in the project.  See more in [Prework](./prework)
 
+---
+
 **Documentation of Stages**
 
 - **[Raw Tables](./docs/RawTables.md)**

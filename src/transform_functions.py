@@ -160,7 +160,7 @@ def _transform_departure_flights(
     df[id_name] = df.index
 
     # 3. Take Columns of interest
-    df = df[df_departures_columns]
+    #df = df[df_departures_columns]
 
     # 4. Duplicate values
     df.drop_duplicates(inplace=True)
