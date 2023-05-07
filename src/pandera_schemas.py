@@ -62,9 +62,9 @@ class stg_departures_schema(pa.DataFrameModel):
     op_unique_carrier: Series[str] = pa.Field()
     origin: Series[str] = pa.Field()
     dest: Series[str] = pa.Field()
-    cancelled: Series[int] = pa.Field(ge=0)
+    id_cancelled: Series[int] = pa.Field(ge=0)
     mesonet_station: Series[str] = pa.Field()
-    active_weather: Series[int] = pa.Field(nullable=False)
+    id_active_weather: Series[int] = pa.Field(nullable=False)
 
 
 class stg_aircraft_schema(pa.DataFrameModel):

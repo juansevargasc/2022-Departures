@@ -6,6 +6,8 @@ from pandera_schemas import *
 from exceptions import SchemaError
 from constants import *
 from utils import *
+import pyarrow.parquet as pq
+import pyarrow as parr
 import os
 from transform_functions import (
     _standard_transform_in_df,
@@ -13,6 +15,7 @@ from transform_functions import (
     _transform_airports,
     _transform_departure_flights,
 )
+from timeit import default_timer as timer
 
 # ------------------------------------------------
 # LOGGING
@@ -229,8 +232,8 @@ def extract_and_transform_raw_files_and_convert_to_stg_tables() -> bool:
     )
 
     # DEBUG
-    logging.info(stg_active_weather.info())
-    logging.info(f"stg_active_weather: {stg_active_weather.info()}")
+    # logging.info(stg_active_weather.info())
+    logging.info(f"stg_active_weather: {stg_active_weather.head()}")
     logging.info(f"stg_cancellation: {stg_cancellation.info()}")
     logging.debug(f"stg_carriers: {stg_carriers.info()}")
     logging.debug(f"stg_airports: {stg_airports.info()}")
@@ -256,47 +259,100 @@ def extract_and_transform_raw_files_and_convert_to_stg_tables() -> bool:
 
     return result
 
-def lookup_for_fk(main_df: pd.DataFrame, fk_df: pd.DataFrame):
-    pass
-    #for row in main_df.iterrows()
+
+def look_fk(column_list: list):
+    fact_table
+
+
+def lookup_for_fk_aircraft(
+    fact_table: pd.DataFrame, dim_aircraft: pd.DataFrame
+) -> pd.DataFrame:
+    """
+    Lookup for the FK in the fact table, using the Dim Table Aircrafts.
+
+    Arguments:
+        fact_table -- Main table.
+        dim_aircraft -- Dimension table.
+
+    Returns:
+        pd.DataFrame -- Fact table with the new FK column.
+    """
+
+    # Adding the new FK column to the fact table
+    print("NEW TABLE")
+    fact_table = fact_table.merge(dim_aircraft, how="left", on=df_aircraft_columns)
+    print(fact_table.head(20))
+
+    fact_table.drop(columns=df_aircraft_columns, axis=1, inplace=True)
+
+    return fact_table
+
+    ### OLD CODE
+    # Adding the new FK column to the fact table, by default -1.
+    # fact_table["id_aircraft"] = -1
+    # for index, _ in aircraft_in_fact_table.iterrows():
+    #     # The row in fact table.
+    #     fact_row = aircraft_in_fact_table.iloc[index]
+    #     manufacturer, icao_type = fact_row["manufacturer"], fact_row["icao_type"]
+    #     dim_aircraft_conditioned = dim_aircraft[
+    #         (dim_aircraft == manufacturer) & (dim_aircraft == icao_type)
+    #     ]
+
+    #     for index_aircraft, _ in dim_aircraft_conditioned.iterrows():
+    #         # The row in the Dim Table Aircrafts.
+    #         row_aircraft = dim_aircraft.iloc[index_aircraft][df_aircraft_columns]
+
+    #         if row_aircraft.equals(fact_row):
+    #             # print("FOUND MATCH")
+    #             id_aircraft = dim_aircraft.loc[index_aircraft, "id_aircraft"]
+    #             fact_table.loc[index, "id_aircraft"] = id_aircraft
+    #             continue
+
 
 def transform_stg_to_fact_dim_tables(path_to_stg: str, types_of_columns: dict) -> bool:
-    #pass
+    # pass
     # TODO: Implement this function.
 
+    # 1. Fetching Stg.
     fact_table = pd.read_csv("{}/stg_departures.csv".format(path_to_stg))
-    # dim_active_weather = pd.read_csv("{}/stg_active_weather.csv".format(path_to_stg))
-    # dim_cancellation = pd.read_csv("{}/stg_cancellation.csv".format(path_to_stg))
+    dim_active_weather = pd.read_csv("{}/stg_active_weather.csv".format(path_to_stg))
+    dim_cancellation = pd.read_csv("{}/stg_cancellation.csv".format(path_to_stg))
     dim_carriers = pd.read_csv("{}/stg_carriers.csv".format(path_to_stg))
     dim_airports = pd.read_csv("{}/stg_airports.csv".format(path_to_stg))
     dim_aircraft = pd.read_csv("{}/stg_aircraft.csv".format(path_to_stg))
-    
-    
-    #fact_table = fact_table.astype(df_fact_departures_types)
-    #print(fact_table.info())
-    
-    # Aircraft FK processing
-    aircraft_in_fact_table = fact_table[df_aircraft_columns]
-    print(aircraft_in_fact_table.info())
-    print(aircraft_in_fact_table.head())
-    
-    #dim_aircraft = dim_aircraft[df_aircraft_columns]
-    print(dim_aircraft.info())
-    print(dim_aircraft.head())
-    
-    for index, _ in aircraft_in_fact_table.iterrows():
-        for index, _ in dim_aircraft[df_aircraft_columns].iterrows():
-            row_aircraft = dim_aircraft.iloc[index]
-            fact_row = aircraft_in_fact_table.iloc[index]
-            
-            if row_aircraft.equals(fact_row):
-                print("FOUND MATCH")
-                #print(row_aircraft)
-                #print(fact_row)
-                print('Index', index)
-                print( dim_aircraft.iloc[index] )
-                break
-        break
+
+    # Dropping all NAN's in main table
+    fact_table = fact_table.dropna(how="any")
+
+    # Dropping NAN's in dim tables.
+    dim_active_weather.dropna(how="any", inplace=True)
+    dim_cancellation.dropna(how="any", inplace=True)
+    dim_carriers.dropna(how="any", inplace=True)
+    dim_airports.dropna(how="any", inplace=True)
+    dim_aircraft.dropna(how="any", inplace=True)
+
+    # 3. Start FK lookup
+    fact_table = lookup_for_fk_aircraft(fact_table, dim_aircraft)
+
+    # Dtypes
+    try:
+        fact_table = fact_table.astype(types_of_columns, copy=False)
+    except Exception as e:
+        print("Certain df types could not be converted. Continue...")
+        logging.error("DF TYPE CANNOT BE CONVERTED: %s", e)
+    print(fact_table.info())
+
+    pq.write_table(
+        parr.Table.from_pandas(fact_table),
+        "data/redshift_target/fact_departures.parquet",
+    )
+    dim_active_weather.to_csv(
+        "data/redshift_target/dim_active_weather.csv", index=False
+    )
+    dim_cancellation.to_csv("data/redshift_target/dim_cancellation.csv", index=False)
+    dim_carriers.to_csv("data/redshift_target/dim_carriers.csv", index=False)
+    dim_airports.to_csv("data/redshift_target/dim_airports.csv", index=False)
+    dim_aircraft.to_csv("data/redshift_target/dim_aircraft.csv", index=False)
 
 
 def load_to_staging_in_s3(path_to_files: str) -> bool:
@@ -370,6 +426,9 @@ def load_to_S3_to_redshift(path_to_files: str) -> bool:
 
 
 if __name__ == "__main__":
+    # Start timer
+    start = timer()
+
     # 1. Extract and Trnasform
     # if extract_and_transform_raw_files_and_convert_to_stg_tables():
     #     print("Extract and Transform: SUCCESS :)")
@@ -379,13 +438,16 @@ if __name__ == "__main__":
     # if load_to_staging_in_s3(path_to_staging_files):
     #     print("Load to S3: SUCCESS :)")
 
-
+    # 3.
     transform_stg_to_fact_dim_tables(
-        path_to_stg=path_to_staging_files, 
-        types_of_columns=df_departures_types
+        path_to_stg=path_to_staging_files, types_of_columns=df_fact_departures_types
     )
 
     # 3. Final
     # if load_to_S3_to_redshift(path_to_staging_files):
     #     print("Load to S3 Redshift target: SUCCESS :)")
 
+    # End Timer
+    end = timer()
+    minutes = (end - start) / 60
+    print(f"Time: {minutes:.6f} minutes")

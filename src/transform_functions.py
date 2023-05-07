@@ -119,10 +119,15 @@ def _transform_aircrafts(
     df_aircrafts.reset_index(inplace=True, drop=True)
     df_aircrafts[id_name] = df_aircrafts.index
 
-    # 4. Enforce data types.
+    # 3. Enforce data types.
     df_aircrafts = df_aircrafts.astype(df_types, copy=False)
 
-    # 3. Change name.
+    # 4.
+    df_aircrafts = df_aircrafts.sort_values(
+        by=["manufacturer", "icao_type"], ascending=True
+    )
+
+    # 5. Change name.
     df_aircrafts.name = df_name
 
     # Final Check. Does it comply with the schema?
@@ -160,20 +165,23 @@ def _transform_departure_flights(
     df[id_name] = df.index
 
     # 3. Take Columns of interest
-    #df = df[df_departures_columns]
+    # df = df[df_departures_columns]
 
     # 4. Duplicate values
     df.drop_duplicates(inplace=True)
 
     # Based on data exploration 'Active Weather' already a FK, is int and not float
     # Filling nan's
-    df.loc[:, "active_weather"] = df["active_weather"].fillna(-1)
-    df["active_weather"] = df["active_weather"].apply(lambda x: cast_to_int(x))
+    df.loc[:, "id_active_weather"] = df["id_active_weather"].fillna(-1)
+    df["id_active_weather"] = df["id_active_weather"].apply(lambda x: cast_to_int(x))
 
     # Filling nan's for booleans
     df["high_level_cloud"] = df["high_level_cloud"].fillna(0)
     df["mid_level_cloud"] = df["mid_level_cloud"].fillna(0)
     df["low_level_cloud"] = df["low_level_cloud"].fillna(0)
+
+    # Sort Values
+    df = df.sort_values(by=["flight_date", "manufacturer"], ascending=True)
 
     # 5. Enforce data types.
     try:

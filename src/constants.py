@@ -3,7 +3,7 @@
 # VARIABLES
 # Database in Postgres.
 SQL_SCRIPT_GET_ALL_DEPARTURES = (
-    "SELECT * FROM departures ORDER BY fl_date ASC LIMIT 1000"
+    "SELECT * FROM departures ORDER BY fl_date ASC LIMIT 100000"
 )
 USERNAME = "postgres"
 PASSWORD = "mysecretpass"
@@ -85,9 +85,9 @@ df_departures_types = {
     "op_unique_carrier": "string",
     "origin": "string",
     "dest": "string",
-    "cancelled": "int64",
+    "id_cancelled": "int64",
     "mesonet_station": "string",
-    "active_weather": "int64",
+    "id_active_weather": "int64",
 }
 
 df_aircraft_types = {
@@ -134,9 +134,9 @@ df_departures_columns = [
     "op_unique_carrier",
     "origin",
     "dest",
-    "cancelled",
+    "id_cancelled",
     "mesonet_station",
-    "active_weather",
+    "id_active_weather",
 ]
 
 # Rename Columns
@@ -156,17 +156,44 @@ df_airports_rename_columns = {
     "MESONET_STATION": "mesonet_code",
 }
 
-df_departures_rename_columns = {"wind_spd": "wind_speed", "fl_date": "flight_date"}
+df_departures_rename_columns = {
+    "active_weather": "id_active_weather",
+    "cancelled": "id_cancelled",
+    "wind_spd": "wind_speed",
+    "fl_date": "flight_date",
+}
 
 
 # Fact Dim Tables
 # Foreign key columns specification
 df_fact_departures_types = {
-    "mkt_unique_carrier": "int64",  # FK
-    "op_unique_carrier": "int64",  # FK
-    "origin": "int64",  # FK
-    "dest": "int64",  # FK
-    "cancelled": "int64",  # Comes already as FK
-    "mesonet_station": "int64",  # FK
-    "active_weather": "int64",  # Comes already as FK
+    "id_aircraft": "int64",  # New
+    "id_departure": "int64",
+    "flight_date": "datetime64[ns]",
+    "dep_hour": "int64",
+    "mkt_carrier_fl_num": "int64",
+    "op_carrier_fl_num": "int64",
+    "dep_time": "datetime64[ns]",
+    "crs_dep_time": "datetime64[ns]",
+    "taxi_out": "int64",
+    "dep_delay": "int64",
+    "air_time": "int64",
+    "distance": "float64",
+    "wind_dir": "float64",
+    "wind_speed": "float64",
+    "wind_gust": "float64",
+    "visibility": "float64",
+    "temperature": "float64",
+    "dew_point": "float64",
+    "rel_humidity": "float64",
+    "low_level_cloud": "bool",
+    "mid_level_cloud": "bool",
+    "high_level_cloud": "bool",
+    "mkt_unique_carrier": "category",
+    "op_unique_carrier": "category",
+    "origin": "category",
+    "dest": "category",
+    "id_cancelled": "int64",
+    "mesonet_station": "string",
+    "id_active_weather": "int64",
 }
